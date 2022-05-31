@@ -34,15 +34,19 @@ def _select_mutations_random(non_trivial_words: List[Word],
                 of the tuple is the nontrivial word that is to be replaced. The second element of
                 the tuple is the variant that was chosen for the word as a replacement.
     """
-    assert num_replacements <= len(non_trivial_words), "not enough nontrivial words to replace"
+    if num_replacements > len(non_trivial_words):
+        return []
 
     choices = set()
 
     for _ in range(num_variants):
         while True:
             words = rng.sample(non_trivial_words, num_replacements)
-            mutations = {(word, rng.choice(word.variants.keys())) for word in words}
+
+            mutations = {(word, rng.choice(list(word.variants.keys()))) for word in words}
+
             mutations = frozenset(mutations)
+
             if mutations not in choices:
                 choices.add(mutations)
                 break
@@ -55,7 +59,8 @@ def _select_mutations_random(non_trivial_words: List[Word],
 def _select_mutations_most_common_first(nontrivial_words: List[Word],
                                         num_replacements: int,
                                         num_variants: int,
-                                        rng: Random) -> List[List[Tuple[Word, str]]]:
+                                        rng: Random,
+                                        assureVariants: bool = True) -> List[List[Tuple[Word, str]]]:
     """
     Selects mutations based on how many times a variant for a nontrivial word was suggested by
     WordNet. The mutations with the highest counts are chosen first. But for a single word, only one
@@ -82,36 +87,56 @@ def _select_mutations_most_common_first(nontrivial_words: List[Word],
     """
 
     # Some preparations: group mutations by the number of times it is suggested by WordNet
-    grouped_by_counts = dict()
+
+    grouped_by_counts = {}
+    used_words = []
     for word in nontrivial_words:
+
         for variant, count in word.variants.items():
+            if word.value not in used_words:
+                used_words.append(word.value)
             if count not in grouped_by_counts.keys():
                 grouped_by_counts[count] = {(word, variant)}
             else:
                 grouped_by_counts[count].add((word, variant))
 
+    if len(nontrivial_words) < num_replacements or len(used_words) < num_replacements:
+        return []
     groups = list(grouped_by_counts.keys())
+
     groups.sort(reverse=True)
 
     # Choose the mutations.
     mutations_list = []
+    notAllVariants = False
     for _ in range(num_variants):
+
         mutations = []
         chosen_words = set()
         current_group_number = 0
-        while len(chosen_words) < num_replacements:
+
+        while len(chosen_words) < num_replacements and current_group_number < len(groups):
+
             group = grouped_by_counts[groups[current_group_number]]
             candidates = [x for x in group if x[0] not in chosen_words]
+
             if len(candidates) > 0:
+
                 mutation = rng.choice(candidates)
                 chosen_words.add(mutation[0])
                 mutations.append(mutation)
+
                 group.remove(mutation)
             else:
                 current_group_number += 1
+        if current_group_number == len(groups):
+            # If we do not get all the variants we want we return an empty list
+            notAllVariants = True and assureVariants
+            break
+
         mutations_list.append(mutations)
 
-    return mutations_list
+    return mutations_list if not notAllVariants else list()
 
 
 MUTATION_SELECTION_STRATEGIES = {

@@ -28,16 +28,22 @@ class ReplacementMutator(Mutator):
         self.num_replacements = num_replacements
         self.num_variants = num_variants
         self.selection_strategy = selection_strategy
+        self.non_mutated = 0
 
     def mutate(self, input_sentence: str, random_seed: int) -> List[str]:
         """
         TODO comment
         """
-        return mutate_by_replacement(input_sentence,
-                                     num_replacements=self.num_replacements,
-                                     num_variants=self.num_variants,
-                                     selection_strategy=self.selection_strategy,
-                                     random_seed=random_seed)
+        results = mutate_by_replacement(input_sentence,
+                                        num_replacements=self.num_replacements,
+                                        num_variants=self.num_variants,
+                                        selection_strategy=self.selection_strategy,
+                                        random_seed=random_seed)
+
+        if len(results) == 0:
+            self.non_mutated += 1
+
+        return results
 
 
 class DropoutMutator(Mutator):

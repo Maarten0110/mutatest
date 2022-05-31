@@ -7,6 +7,8 @@ __pycache__/
 # C extensions
 *.so
 
+tests/resources/*.py
+tests/resources/*.txt
 # Distribution / packaging
 .Python
 build/

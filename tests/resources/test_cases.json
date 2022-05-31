@@ -1,0 +1,22 @@
+[
+    {
+        "num_replacements": 2,
+        "num_variants": 10,
+        "selection_strategy": "random"
+    },
+    {
+        "num_replacements": 5,
+        "num_variants": 4,
+        "selection_strategy": "random"
+    },
+    {
+        "num_replacements": 2,
+        "num_variants": 3,
+        "selection_strategy": "most_common_first"
+    },
+    {
+        "num_replacements": 3,
+        "num_variants": 2,
+        "selection_strategy": "most_common_first"
+    }
+]
