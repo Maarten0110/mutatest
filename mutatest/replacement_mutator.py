@@ -1,5 +1,5 @@
 from typing import Tuple, List, Callable
-from extension.Word import Word
+from mutatest.Word import Word
 from nltk.tokenize import word_tokenize
 import nltk
 import random as random_pkg

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List
-from extension.replacement_mutator import mutate_by_replacement
+from mutatest.replacement_mutator import mutate_by_replacement
 
 
 class Mutator(ABC):
