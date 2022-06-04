@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 from replacement_mutator import mutate_by_replacement
+from dropout_mutator import mutate_by_dropout
 
 
 class Mutator(ABC):
@@ -42,6 +43,15 @@ class ReplacementMutator(Mutator):
 
 class DropoutMutator(Mutator):
 
+    def __init__(self,
+                 num_dropouts: int = 1):
+        """
+        TODO comment (get from function)
+        """
+        self.num_dropouts = num_dropouts
+
     def mutate(self, input_sentence: str, random_seed: int) -> List[str]:
         # TODO
-        pass
+        return mutate_by_dropout(input_sentence,
+                                    num_dropouts=self.num_dropouts,
+                                    random_seed=random_seed)
