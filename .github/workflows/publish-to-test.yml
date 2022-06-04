@@ -1,0 +1,44 @@
+name: Publish package to TestPyPi
+on:
+    push:
+        branches:
+            - master
+        tags:
+            - "v[0-9]+.[0-9]+.[0-9]+-test"
+
+jobs:
+    publish-to-test:
+        name: Build and publish package to TestPyPi.
+        runs-on: ubuntu-latest
+        steps:
+          - name: Set up Python 3.7
+              uses: actions/setup-python@v1
+              with:
+                python-version: 3.7
+
+            - name: Parse version info from tag
+              run: |
+                  # GITHUB_REF is like refs/tags/v2.3.5, so strip the first 11 chars
+                  VERSION=${GITHUB_REF:11}
+                  MAJOR=`echo "$VERSION" | cut -d . -f 1`
+                  MINOR=`echo "$VERSION" | cut -d . -f 2`
+                  PATCH=`echo "$VERSION" | cut -d . -f 3`
+                  echo "version=$VERSION" >> $GITHUB_ENV
+                  echo "version_major=$MAJOR" >> $GITHUB_ENV
+                  echo "version_minor=$MINOR" >> $GITHUB_ENV
+                  echo "version_patch=$PATCH" >> $GITHUB_ENV
+
+            - name: write version to file
+              run: echo "$MAJOR.$MINOR.$PATCH" >> __version__.txt
+
+            - name: Build using setuptools
+              run: python setup.py sdist
+              
+
+            - name: Publish package to TestPyPI
+              uses: pypa/gh-action-pypi-publish@release/v1
+              with:
+                user: maartenvt
+                password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+                repository_url: https://test.pypi.org/legacy/
+ 
