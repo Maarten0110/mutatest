@@ -8,9 +8,18 @@ try:
 except:
     long_description = short_description
 
+version = None
+try:
+    version = open("__version__.txt").read()\
+        .strip()\
+        .replace("v", "")\
+        .replace("-test", "")
+except:
+    exit("version file not found")
+
 setup(
     name='mutamorphic-test',
-    version='0.1.0',
+    version=version,
     description=short_description,
     author="Maarten van Tartwijk",
     author_email='m.j.vantartwijk@student.tudelft.nl',
