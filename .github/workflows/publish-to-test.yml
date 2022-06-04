@@ -30,7 +30,9 @@ jobs:
                   echo "version_patch=$PATCH" >> $GITHUB_ENV
 
             - name: write version to file
-              run: echo "$MAJOR.$MINOR.$PATCH" >> __version__.txt
+              run: |
+                echo ${{ env.version_major }}.${{ env.version_minor }}.${{ env.version_patch }}
+                echo ${{ env.version_major }}.${{ env.version_minor }}.${{ env.version_patch }} >> __version__.txt
 
             - name: Build using setuptools
               run: python setup.py sdist
