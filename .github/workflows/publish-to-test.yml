@@ -22,8 +22,8 @@ jobs:
                   VERSION=${GITHUB_REF:11}
                   MAJOR=`echo "$VERSION" | cut -d . -f 1`
                   MINOR=`echo "$VERSION" | cut -d . -f 2`
-                  TEMP = `echo "$VERSION" | cut -d . -f 3`
-                  PATCH= `echo "$VERSION" | cut -d - -f 1`
+                  TEMP=`echo "$VERSION" | cut -d . -f 3`
+                  PATCH=`echo "$TEMP" | cut -d - -f 1`
                   echo "version=$VERSION" >> $GITHUB_ENV
                   echo "version_major=$MAJOR" >> $GITHUB_ENV
                   echo "version_minor=$MINOR" >> $GITHUB_ENV
