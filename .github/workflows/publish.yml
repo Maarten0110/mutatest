@@ -2,11 +2,11 @@ name: Publish package to TestPyPi
 on:
     push:
         tags:
-            - "v[0-9]+.[0-9]+.[0-9]+-test"
+            - "v[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
-    publish-to-test:
-        name: Build and publish package to TestPyPi.
+    publish:
+        name: Build and publish package to PyPi.
         runs-on: ubuntu-latest
         steps:
             - name: Checkout repository
@@ -22,8 +22,7 @@ jobs:
                   VERSION=${GITHUB_REF:11}
                   MAJOR=`echo "$VERSION" | cut -d . -f 1`
                   MINOR=`echo "$VERSION" | cut -d . -f 2`
-                  TEMP=`echo "$VERSION" | cut -d . -f 3`
-                  PATCH=`echo "$TEMP" | cut -d - -f 1`
+                  PATCH=`echo "$VERSION" | cut -d . -f 3`
                   echo "version=$VERSION" >> $GITHUB_ENV
                   echo "version_major=$MAJOR" >> $GITHUB_ENV
                   echo "version_minor=$MINOR" >> $GITHUB_ENV
@@ -34,11 +33,8 @@ jobs:
 
             - name: Build using setuptools
               run: python setup.py sdist
-              
 
-            - name: Publish package to TestPyPI
-              uses: pypa/gh-action-pypi-publish@release/v1
+            - name: Publish package to PyPI
+              uses: pypa/gh-action-pypi-publish@master
               with:
-                password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-                repository_url: https://test.pypi.org/legacy/
- 
+                password: ${{ secrets.PYPI_API_TOKEN }}
