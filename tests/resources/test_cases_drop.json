@@ -1,0 +1,14 @@
+[
+    {
+        "num_dropouts": 2,
+        "num_variants": 2
+    },
+    {
+        "num_dropouts": 4,
+        "num_variants": 2
+    },
+    {
+        "num_dropouts": 6,
+        "num_variants": 4
+    }
+]
