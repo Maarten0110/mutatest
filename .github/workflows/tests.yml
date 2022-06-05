@@ -8,7 +8,7 @@ jobs:
         name: Run test suite
         runs-on: ubuntu-20.04
         container:
-            image: ghcr.io/${{ github.repository }}
+            image: ghcr.io/maarten0110/mutatest
             credentials:
                 username: ${{ github.actor }}
                 password: ${{ secrets.github_token }}
