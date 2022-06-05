@@ -9,7 +9,8 @@ from random import Random
 def _select_mutations_random(non_trivial_words: List[Word],
                              num_replacements: int,
                              num_variants: int,
-                             rng: Random) -> List[List[Tuple[Word, str]]]:
+                             rng: Random,
+                             assure_variants: bool = False) -> List[List[Tuple[Word, str]]]:
     """
     Selects mutations at random. Ensures that each output sentence is unique, although mutations
     at the nontrivial word level might be reused across output sentences. For each output sentence,
@@ -34,8 +35,12 @@ def _select_mutations_random(non_trivial_words: List[Word],
                 of the tuple is the nontrivial word that is to be replaced. The second element of
                 the tuple is the variant that was chosen for the word as a replacement.
     """
-    if num_replacements > len(non_trivial_words):
+    # If we want to assure the number of variants we do not use the phrase
+    # Otherwise we return as many variants as possible.
+    if num_replacements > len(non_trivial_words) and assure_variants:
         return []
+    else:
+        num_replacements = len(non_trivial_words)
 
     choices = set()
 
@@ -60,7 +65,7 @@ def _select_mutations_most_common_first(nontrivial_words: List[Word],
                                         num_replacements: int,
                                         num_variants: int,
                                         rng: Random,
-                                        assureVariants: bool = True) -> List[List[Tuple[Word, str]]]:
+                                        assure_variants: bool = False) -> List[List[Tuple[Word, str]]]:
     """
     Selects mutations based on how many times a variant for a nontrivial word was suggested by
     WordNet. The mutations with the highest counts are chosen first. But for a single word, only one
@@ -108,7 +113,6 @@ def _select_mutations_most_common_first(nontrivial_words: List[Word],
 
     # Choose the mutations.
     mutations_list = []
-    notAllVariants = False
     for _ in range(num_variants):
 
         mutations = []
@@ -131,12 +135,15 @@ def _select_mutations_most_common_first(nontrivial_words: List[Word],
                 current_group_number += 1
         if current_group_number == len(groups):
             # If we do not get all the variants we want we return an empty list
-            notAllVariants = True and assureVariants
-            break
+            # Or we just return the results so far, if is not strict.
+            if assure_variants:
+                return list()
+            else:
+                break
 
         mutations_list.append(mutations)
 
-    return mutations_list if not notAllVariants else list()
+    return mutations_list
 
 
 MUTATION_SELECTION_STRATEGIES = {
@@ -161,7 +168,8 @@ def mutate_by_replacement(input_sentence: str,
                           num_replacements: int = 1,
                           num_variants: int = 5,
                           selection_strategy: str = "random",
-                          random_seed: int = 13) -> List[str]:
+                          random_seed: int = 13,
+                          assure_variants: bool = False) -> List[str]:
     """
     Returns a list of mutated version of the given input sentence. Mutations are based on synonyms
     and hypernyms of nontrivial words. Nontrivial words are words that are not stopwords (as defined
@@ -206,7 +214,7 @@ def mutate_by_replacement(input_sentence: str,
     mutations_list = selection_strategy_func(list(non_trivial_words.keys()),
                                              num_replacements,
                                              num_variants,
-                                             rng)
+                                             rng, assure_variants)
 
     mutated_sentences = []
     for mutations in mutations_list:

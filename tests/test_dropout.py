@@ -23,8 +23,8 @@ def difference_senteces_words(sentence1, sentence2):
     return len(list(set(words_sentence1) - set(words_sentence2)) + list(set(words_sentence2) - set(words_sentence1)))
 
 
-def test_replacement():
-    from mutatest.mutators import ReplacementMutator
+def test_dropout():
+    from mutatest.mutators import DropoutMutator
 
     TEST_SENTENCES = load_json("tests/resources/example_sentences.json")
 
@@ -35,24 +35,23 @@ def test_replacement():
 
     TEST_SENTENCES = TEST_SENTENCES[index_1:index_2]
 
-    TEST_CASES = load_json("tests/resources/test_cases_replacement.json")
+    TEST_CASES = load_json("tests/resources/test_cases_drop.json")
 
     for test_case in TEST_CASES:
 
-        replacement_mutator = ReplacementMutator(
-            num_replacements=test_case["num_replacements"], num_variants=test_case["num_variants"], selection_strategy=test_case["selection_strategy"])
+        dropout_mutator = DropoutMutator(test_case["num_dropouts"], test_case["num_variants"])
 
         for test_sentence in TEST_SENTENCES:
-            resulting_sentences = replacement_mutator.mutate(test_sentence, SEED, True)
+            resulting_sentences = dropout_mutator.mutate(test_sentence, SEED, True)
             for result in resulting_sentences:
                 if len(result) > 0:
 
                     assert len(
-                        resulting_sentences) == test_case["num_variants"], "The replacement mutator is not creating enough variants."
+                        resulting_sentences) == test_case["num_variants"], "The dropout mutator is not creating enough variants."
                     assert difference_senteces_words(
-                        test_sentence, result), "The replacement mutator is not replacing enough words."
+                        test_sentence, result), "The dropout mutator is not dropping enough words."
 
-        # print(replacement_mutator.non_mutated)
+        # print(dropout_mutator.non_mutated)
 
 
-test_replacement()
+test_dropout()
