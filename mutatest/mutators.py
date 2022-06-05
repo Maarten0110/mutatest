@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
-from replacement_mutator import mutate_by_replacement
-from dropout_mutator import mutate_by_dropout
+from .dropout_mutator import mutate_by_dropout
+from .replacement_mutator import mutate_by_replacement
 
 
 class Mutator(ABC):

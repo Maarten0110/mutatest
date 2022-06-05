@@ -1,5 +1,5 @@
 from typing import List, Iterable, Callable, Generic, TypeVar
-from mutators import Mutator
+from .mutators import Mutator
 import numpy as np
 
 ModelOutput = TypeVar("ModelOutput")
