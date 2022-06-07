@@ -1,0 +1,2 @@
+include __version__.txt
+include README.md

@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
 
+VERSION_FILE = "__version__.txt"
 short_description = 'Mutamorhpic testing tool for text-based machine learning problems.'
 
 try:
@@ -10,12 +11,12 @@ except:
 
 version = None
 try:
-    version = open("__version__.txt").read()\
+    version = open(VERSION_FILE).read()\
         .strip()\
         .replace("v", "")\
         .replace("-test", "")
 except:
-    exit("version file not found")
+    exit("mutamorphic-test publishing error: Version file not found")
 
 setup(
     name='mutamorphic-test',
@@ -24,6 +25,7 @@ setup(
     author="Maarten van Tartwijk",
     author_email='m.j.vantartwijk@student.tudelft.nl',
     packages=find_packages(include=['mutatest']),
+    include_package_data=True,
     project_urls={
         'Source': 'https://github.com/Maarten0110/mutatest',
     },
