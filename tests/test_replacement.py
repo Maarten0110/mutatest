@@ -17,10 +17,15 @@ def load_json(filename):
 
 def difference_senteces_words(sentence1, sentence2):
 
-    words_sentence1 = word_tokenize(sentence1)
-    words_sentence2 = word_tokenize(sentence2)
+    words_sentence1 = word_tokenize(sentence1.lower())
+    words_sentence2 = word_tokenize(sentence2.lower())
 
-    return len(list(set(words_sentence1) - set(words_sentence2)) + list(set(words_sentence2) - set(words_sentence1)))
+    words_sentence1.sort()
+    words_sentence2.sort()
+
+    result = len(list(set(words_sentence1) - set(words_sentence2)))
+
+    return result
 
 
 def test_replacement():
@@ -36,7 +41,6 @@ def test_replacement():
     TEST_SENTENCES = TEST_SENTENCES[index_1:index_2]
 
     TEST_CASES = load_json("tests/resources/test_cases_replacement.json")
-
     for test_case in TEST_CASES:
 
         replacement_mutator = ReplacementMutator(
@@ -44,15 +48,16 @@ def test_replacement():
 
         for test_sentence in TEST_SENTENCES:
             resulting_sentences = replacement_mutator.mutate(test_sentence, SEED, True)
+            if resulting_sentences != []:
+
+                assert len(
+                    resulting_sentences) == test_case["num_variants"], "The replacement mutator is not creating enough variants."
+
             for result in resulting_sentences:
                 if len(result) > 0:
 
-                    assert len(
-                        resulting_sentences) == test_case["num_variants"], "The replacement mutator is not creating enough variants."
                     assert difference_senteces_words(
-                        test_sentence, result), "The replacement mutator is not replacing enough words."
-
-        # print(replacement_mutator.non_mutated)
+                        test_sentence, result) == test_case["num_replacements"], "The replacement mutator is not changing the right amount of words."
 
 
 test_replacement()

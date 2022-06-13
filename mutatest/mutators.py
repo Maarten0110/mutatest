@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from typing import List
 from .dropout_mutator import mutate_by_dropout
 from .replacement_mutator import mutate_by_replacement
+from nltk.tokenize import word_tokenize
+from .Word import Word
 
 
 class Mutator(ABC):
@@ -15,6 +17,8 @@ class Mutator(ABC):
         TODO comment
         """
         raise NotImplementedError()
+
+# Both checks that I putted are kind of crap
 
 
 class ReplacementMutator(Mutator):
@@ -42,6 +46,12 @@ class ReplacementMutator(Mutator):
                                         random_seed=random_seed,
                                         assure_variants=assure_variants)
 
+        words_input = word_tokenize(input_sentence.lower())
+        for result in results:
+            words_result = word_tokenize(result.lower())
+
+            if len(list(set(words_result) - set(words_input))) > self.num_replacements:
+                results = list()
         if len(results) == 0:
             self.non_mutated += 1
 
@@ -66,6 +76,14 @@ class DropoutMutator(Mutator):
                                     random_seed=random_seed,
                                     num_variants=self.num_variants,
                                     assure_variants=assure_variants)
+
+        words_input = word_tokenize(input_sentence.lower())
+        for result in results:
+            words_result = word_tokenize(result.lower())
+
+            if len(list(set(words_input) - set(words_result))) != self.num_dropouts:
+                results = list()
+
         if len(results) == 0:
             self.non_mutated += 1
 

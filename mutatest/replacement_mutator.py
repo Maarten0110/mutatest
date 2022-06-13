@@ -1,7 +1,6 @@
 from typing import Tuple, List, Callable
-from .Word import Word
-from nltk.tokenize import word_tokenize
-import nltk
+from .Word import Word, sentence_preprocessing
+
 import random as random_pkg
 from random import Random
 
@@ -37,14 +36,17 @@ def _select_mutations_random(non_trivial_words: List[Word],
     """
     # If we want to assure the number of variants we do not use the phrase
     # Otherwise we return as many variants as possible.
-    if num_replacements > len(non_trivial_words) and assure_variants:
-        return []
-    else:
-        num_replacements = len(non_trivial_words)
+    if num_replacements > len(non_trivial_words):
+
+        if assure_variants:
+            return []
+        else:
+            num_replacements = len(non_trivial_words)
 
     choices = set()
 
     for _ in range(num_variants):
+
         while True:
             words = rng.sample(non_trivial_words, num_replacements)
 
@@ -128,6 +130,7 @@ def _select_mutations_most_common_first(nontrivial_words: List[Word],
 
                 mutation = rng.choice(candidates)
                 chosen_words.add(mutation[0])
+
                 mutations.append(mutation)
 
                 group.remove(mutation)
@@ -204,9 +207,8 @@ def mutate_by_replacement(input_sentence: str,
     rng = random_pkg.Random()
     rng.seed(a=random_seed)
 
-    tokens = word_tokenize(input_sentence)
-    tokens_with_pos_tags = nltk.pos_tag(tokens)
-    words = [Word.from_tuple(t) for t in tokens_with_pos_tags]
+    words = sentence_preprocessing(input_sentence)
+
     non_trivial_words = {word: index for (index, word) in enumerate(words) if word.is_nontrivial}
 
     selection_strategy_func = _get_selection_strategy_func(selection_strategy)

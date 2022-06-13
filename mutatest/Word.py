@@ -3,7 +3,8 @@ from nltk.corpus import stopwords
 import re
 from nltk.corpus import wordnet as wn
 from nltk.corpus.reader import Synset
-
+from nltk.tokenize import word_tokenize
+import nltk
 
 STOPWORDS = stopwords.words('english')
 POS_TAG_MAP = {
@@ -146,3 +147,10 @@ class Word:
 
     def __repr__(self):
         return f"Word(\"{self.value}\", tag: {self.pos_tag}, stopword: {self.is_stopword})"
+
+
+def sentence_preprocessing(input_sentence):
+    tokens = word_tokenize(input_sentence)
+    tokens_with_pos_tags = nltk.pos_tag(tokens)
+    words = [Word.from_tuple(t) for t in tokens_with_pos_tags]
+    return words

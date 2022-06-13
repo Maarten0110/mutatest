@@ -14,17 +14,22 @@ def load_json(filename):
     with open(filename, "r") as file:
         return json.load(file)
 
+# We got a huge problem here
 
-def difference_senteces_words(sentence1, sentence2):
 
-    words_sentence1 = word_tokenize(sentence1)
-    words_sentence2 = word_tokenize(sentence2)
+def difference_senteces_words(input_tokens, output_sentence):
+    from mutatest.Word import sentence_preprocessing
 
-    return len(list(set(words_sentence1) - set(words_sentence2)) + list(set(words_sentence2) - set(words_sentence1)))
+    words = sentence_preprocessing(output_sentence)
+
+    output_tokens = [word.value for word in words]
+
+    return len(list(set(input_tokens) - set(output_tokens)))
 
 
 def test_dropout():
     from mutatest.mutators import DropoutMutator
+    from mutatest.Word import sentence_preprocessing
 
     TEST_SENTENCES = load_json("tests/resources/example_sentences.json")
 
@@ -37,21 +42,28 @@ def test_dropout():
 
     TEST_CASES = load_json("tests/resources/test_cases_drop.json")
 
+    counter = 0
     for test_case in TEST_CASES:
 
         dropout_mutator = DropoutMutator(test_case["num_dropouts"], test_case["num_variants"])
 
         for test_sentence in TEST_SENTENCES:
             resulting_sentences = dropout_mutator.mutate(test_sentence, SEED, True)
-            for result in resulting_sentences:
-                if len(result) > 0:
+            words = sentence_preprocessing(test_sentence)
 
-                    assert len(
-                        resulting_sentences) == test_case["num_variants"], "The dropout mutator is not creating enough variants."
-                    assert difference_senteces_words(
-                        test_sentence, result), "The dropout mutator is not dropping enough words."
+            input_tokens = [word.value for word in words]
 
-        # print(dropout_mutator.non_mutated)
+            if len(resulting_sentences) > 0:
+                assert len(
+                    resulting_sentences) == test_case["num_variants"], "The dropout mutator is not creating enough variants."
+                for result in resulting_sentences:
+
+                    if len(result) > 0:
+
+                        word_difference = difference_senteces_words(
+                            input_tokens, result)
+
+                        assert word_difference == test_case["num_dropouts"], "The dropout mutator is not dropping the right amount of words."
 
 
 test_dropout()
