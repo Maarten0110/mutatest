@@ -6,6 +6,7 @@ from nltk.tokenize import word_tokenize
 from .Word import Word
 import re
 import nltk
+from time import time
 from nltk.corpus import stopwords
 nltk.download('stopwords')
 
@@ -55,7 +56,7 @@ class ReplacementMutator(Mutator):
         self.selection_strategy = selection_strategy
         self.non_mutated = 0
 
-    def mutate(self, input_sentence: str, random_seed: int, assure_variants: bool = False) -> List[str]:
+    def mutate(self, input_sentence: str, random_seed: int = int(time()), assure_variants: bool = False) -> List[str]:
         """
         TODO comment
         """
@@ -83,7 +84,7 @@ class DropoutMutator(Mutator):
         self.num_variants = num_variants
         self.non_mutated = 0
 
-    def mutate(self, input_sentence: str, random_seed: int = 13, assure_variants: bool = False) -> List[str]:
+    def mutate(self, input_sentence: str, random_seed: int = int(time()), assure_variants: bool = False) -> List[str]:
 
         results = mutate_by_dropout(input_sentence,
                                     num_dropouts=self.num_dropouts,
