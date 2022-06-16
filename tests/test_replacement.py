@@ -22,6 +22,7 @@ def difference_senteces_words(sentence1, sentence2):
 
     result = 0
     counter = 0
+
     for word in words_sentence1:
 
         if word != words_sentence2[counter]:
@@ -62,18 +63,8 @@ def test_replacement():
             for result in resulting_sentences:
                 if len(result) > 0:
 
-                    if difference_senteces_words(
-                            test_sentence, result) != test_case["num_replacements"]:
-
-                        print("difference", difference_senteces_words(
-                            test_sentence, result))
-                        print("Needed: ", test_case["num_replacements"])
-
-                        print("test sentence: ", word_tokenize(test_sentence))
-                        print("result: ", word_tokenize(result))
-
-                    # assert difference_senteces_words(
-                    #     test_sentence, result) == test_case["num_replacements"], "The replacement mutator is not changing the right amount of words."
+                    assert difference_senteces_words(
+                        test_sentence, result) == test_case["num_replacements"], "The replacement mutator is not changing the right amount of words."
 
 
 test_replacement()

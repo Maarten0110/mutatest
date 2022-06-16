@@ -53,7 +53,6 @@ def _select_mutations_random(non_trivial_words: List[Word],
             mutations = {(word, rng.choice(list(word.variants.keys()))) for word in words}
 
             mutations = frozenset(mutations)
-
             if mutations not in choices:
                 choices.add(mutations)
                 break
@@ -128,19 +127,12 @@ def _select_mutations_most_common_first(nontrivial_words: List[Word],
             # We do not want single words to be replaced by two wrods
             candidates = [x for x in group if x[0] not in chosen_words]
 
-            # print(len(candidates[0][0].split(" ")) < 2)
-
             if len(candidates) > 0:
 
                 mutation = rng.choice(candidates)
                 chosen_words.add(mutation[0])
-                new_mutation = mutation
 
-                # Some times it replaces a word by two and other times it replaces it by an empty space
-                if len(mutation[1].split(" ")) > 1 or mutation[1].strip() == '':
-                    new_mutation = (mutation[0], mutation[1].replace(" ", "-"))
-
-                mutations.append(new_mutation)
+                mutations.append(mutation)
 
                 group.remove(mutation)
             else:
@@ -228,15 +220,25 @@ def mutate_by_replacement(input_sentence: str,
                                              rng, assure_variants)
 
     mutated_sentences = []
+    sentence_og = [word.value for word in words]
+
     for mutations in mutations_list:
-        sentence = [word.value for word in words]
+        sentence = sentence_og.copy()
         for mutation in mutations:
             word = mutation[0]
-            replacement = mutation[1]
+
+            # In order to avoid words that are substitued by two words
+            replacement = mutation[1].replace(" ", "-")
+
+            # Not ideal but nothing more makes sense
+            if replacement == '':
+                replacement = "-"+word.value+"-"
 
             index = non_trivial_words[word]
             sentence[index] = replacement
-        mutated_sentences.append(" ".join(sentence))
+
+        mutated_sentence = " ".join(sentence)
+        mutated_sentences.append(mutated_sentence)
 
     return mutated_sentences
 

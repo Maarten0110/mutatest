@@ -66,12 +66,6 @@ class ReplacementMutator(Mutator):
                                         random_seed=random_seed,
                                         assure_variants=assure_variants)
 
-        words_input = word_tokenize(input_sentence.lower())
-        for result in results:
-            words_result = word_tokenize(result.lower())
-
-            if len(list(set(words_result) - set(words_input))) > self.num_replacements:
-                results = list()
         if len(results) == 0:
             self.non_mutated += 1
 
