@@ -124,14 +124,23 @@ def _select_mutations_most_common_first(nontrivial_words: List[Word],
         while len(chosen_words) < num_replacements and current_group_number < len(groups):
 
             group = grouped_by_counts[groups[current_group_number]]
+
+            # We do not want single words to be replaced by two wrods
             candidates = [x for x in group if x[0] not in chosen_words]
+
+            # print(len(candidates[0][0].split(" ")) < 2)
 
             if len(candidates) > 0:
 
                 mutation = rng.choice(candidates)
                 chosen_words.add(mutation[0])
+                new_mutation = mutation
 
-                mutations.append(mutation)
+                # Some times it replaces a word by two and other times it replaces it by an empty space
+                if len(mutation[1].split(" ")) > 1 or mutation[1].strip() == '':
+                    new_mutation = (mutation[0], mutation[1].replace(" ", "-"))
+
+                mutations.append(new_mutation)
 
                 group.remove(mutation)
             else:
@@ -224,6 +233,7 @@ def mutate_by_replacement(input_sentence: str,
         for mutation in mutations:
             word = mutation[0]
             replacement = mutation[1]
+
             index = non_trivial_words[word]
             sentence[index] = replacement
         mutated_sentences.append(" ".join(sentence))

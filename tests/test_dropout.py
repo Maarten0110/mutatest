@@ -17,18 +17,8 @@ def load_json(filename):
 # We got a huge problem here
 
 
-def difference_senteces_words(input_tokens, output_sentence):
-    from mutatest.Word import sentence_preprocessing
-
-    words = sentence_preprocessing(output_sentence)
-
-    output_tokens = [word.value for word in words]
-
-    return len(list(set(input_tokens) - set(output_tokens)))
-
-
 def test_dropout():
-    from mutatest.mutators import DropoutMutator
+    from mutatest.mutators import DropoutMutator, text_prepare
     from mutatest.Word import sentence_preprocessing
 
     TEST_SENTENCES = load_json("tests/resources/example_sentences.json")
@@ -48,10 +38,13 @@ def test_dropout():
         dropout_mutator = DropoutMutator(test_case["num_dropouts"], test_case["num_variants"])
 
         for test_sentence in TEST_SENTENCES:
-            resulting_sentences = dropout_mutator.mutate(test_sentence, SEED, True)
-            words = sentence_preprocessing(test_sentence)
 
-            input_tokens = [word.value for word in words]
+            # Do the text_prepare for testing pourposes, so each sentence is equal
+            test_sentence = text_prepare(test_sentence)
+
+            resulting_sentences = dropout_mutator.mutate(test_sentence, SEED, True)
+
+            test_tokens = word_tokenize(test_sentence)
 
             if len(resulting_sentences) > 0:
                 assert len(
@@ -59,10 +52,8 @@ def test_dropout():
                 for result in resulting_sentences:
 
                     if len(result) > 0:
-
-                        word_difference = difference_senteces_words(
-                            input_tokens, result)
-
+                        result_tokens = word_tokenize(result)
+                        word_difference = len(test_tokens) - len(result_tokens)
                         assert word_difference == test_case["num_dropouts"], "The dropout mutator is not dropping the right amount of words."
 
 

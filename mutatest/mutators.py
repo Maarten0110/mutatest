@@ -4,6 +4,26 @@ from .dropout_mutator import mutate_by_dropout
 from .replacement_mutator import mutate_by_replacement
 from nltk.tokenize import word_tokenize
 from .Word import Word
+import re
+import nltk
+from nltk.corpus import stopwords
+nltk.download('stopwords')
+
+
+def text_prepare(text):
+    """
+        text: a string
+        return: modified initial string
+    """
+    REPLACE_BY_SPACE_RE = re.compile('[/(){}\[\]\|@,;]')
+    BAD_SYMBOLS_RE = re.compile('[^0-9a-z #+_]')
+    STOPWORDS = set(stopwords.words('english'))
+
+    text = text.lower()  # lowercase text
+    text = re.sub(REPLACE_BY_SPACE_RE, " ", text)  # replace REPLACE_BY_SPACE_RE symbols by space in text
+    text = re.sub(BAD_SYMBOLS_RE, "", text)  # delete symbols which are in BAD_SYMBOLS_RE from text
+    text = " ".join([word for word in text.split() if not word in STOPWORDS])  # delete stopwords from text
+    return text
 
 
 class Mutator(ABC):
@@ -70,19 +90,12 @@ class DropoutMutator(Mutator):
         self.non_mutated = 0
 
     def mutate(self, input_sentence: str, random_seed: int = 13, assure_variants: bool = False) -> List[str]:
-        # TODO
+
         results = mutate_by_dropout(input_sentence,
                                     num_dropouts=self.num_dropouts,
                                     random_seed=random_seed,
                                     num_variants=self.num_variants,
                                     assure_variants=assure_variants)
-
-        words_input = word_tokenize(input_sentence.lower())
-        for result in results:
-            words_result = word_tokenize(result.lower())
-
-            if len(list(set(words_input) - set(words_result))) != self.num_dropouts:
-                results = list()
 
         if len(results) == 0:
             self.non_mutated += 1
