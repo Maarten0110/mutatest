@@ -1,7 +1,6 @@
 from typing import Tuple, List, Callable
-from .Word import Word
-from nltk.tokenize import word_tokenize
-import nltk
+from .Word import sentence_preprocessing
+
 import random as random_pkg
 from random import Random
 from itertools import combinations
@@ -30,9 +29,10 @@ def mutate_by_dropout(input_sentence: str,
     rng = random_pkg.Random()
     rng.seed(a=random_seed)
 
-    tokens = word_tokenize(input_sentence)
-    tokens_with_pos_tags = nltk.pos_tag(tokens)
-    words = [Word.from_tuple(t) for t in tokens_with_pos_tags]
+    words = sentence_preprocessing(input_sentence)
+
+    sentence = [word.value for word in words]
+
     non_stopword_list = {word.value for word in words if not word.is_stopword}
     mutated_sentences = []
     for subset in combinations(non_stopword_list, num_dropouts):
