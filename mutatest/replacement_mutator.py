@@ -45,6 +45,9 @@ def _select_mutations_random(non_trivial_words: List[Word],
 
     choices = set()
 
+    # This counter is for the case where there are not enough variants for the words.
+    safety_counter = 0
+    safety_limit = 500
     for _ in range(num_variants):
 
         while True:
@@ -53,9 +56,15 @@ def _select_mutations_random(non_trivial_words: List[Word],
             mutations = {(word, rng.choice(list(word.variants.keys()))) for word in words}
 
             mutations = frozenset(mutations)
+
+            if safety_counter == safety_limit:
+                return list()
+
             if mutations not in choices:
                 choices.add(mutations)
                 break
+            else:
+                safety_counter += 1
 
     mutations_list = [list(mutations) for mutations in choices]
 
