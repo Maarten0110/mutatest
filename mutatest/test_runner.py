@@ -1,5 +1,6 @@
 from typing import List, Iterable, Callable, Generic, TypeVar
 from .mutators import Mutator
+from .Word import Word, sentence_preprocessing
 import numpy as np
 
 ModelOutput = TypeVar("ModelOutput")
@@ -45,8 +46,25 @@ class MutamorphicTestCase(Generic[ModelOutput]):
 
     @property
     def average_similarity(self) -> float:
+        """
+        Returns: TODO comment
+
+        """
         return np.average(self.similarities)
 
+    def get_nontrivial_words(self) -> List[Word]:
+        """
+        TODO comment
+        """
+        words = sentence_preprocessing(self.input_sentence)
+        return [word for word in words if word.is_nontrivial]
+
+    def get_non_stopwords(self) -> List[Word]:
+        words = sentence_preprocessing(self.input_sentence)
+        return [word for word in words if not word.is_stopword]
+
+    def __repr__(self):
+        return f"MutaTestCase(avg_sim: {self.average_similarity}, input: \"{self.input_sentence}\")"
 
 class MutamorphicTest(Generic[ModelOutput]):
     """

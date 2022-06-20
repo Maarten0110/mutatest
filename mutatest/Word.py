@@ -149,8 +149,9 @@ class Word:
         return f"Word(\"{self.value}\", tag: {self.pos_tag}, stopword: {self.is_stopword})"
 
 
-def sentence_preprocessing(input_sentence):
+def sentence_preprocessing(input_sentence: str) -> List[Word]:
     tokens = word_tokenize(input_sentence)
     tokens_with_pos_tags = nltk.pos_tag(tokens)
     words = [Word.from_tuple(t) for t in tokens_with_pos_tags]
+
     return words
